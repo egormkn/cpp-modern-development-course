@@ -1,3 +1,3 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-add_executable(reverse main.cpp)
+add_library(reverse main.cpp)

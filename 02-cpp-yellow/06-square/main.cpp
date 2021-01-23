@@ -8,6 +8,18 @@
 using namespace std;
 
 template <typename T>
+T Sqr(const T& value);
+
+template <typename F, typename S>
+pair<F, S> Sqr(const pair<F, S>& p);
+
+template <typename T>
+vector<T> Sqr(const vector<T>& v);
+
+template <typename K, typename V>
+map<K, V> Sqr(const map<K, V>& m);
+
+template <typename T>
 T Sqr(const T& value) {
   return value * value;
 }
@@ -20,7 +32,7 @@ pair<F, S> Sqr(const pair<F, S>& p) {
 template <typename T>
 vector<T> Sqr(const vector<T>& v) {
   vector<T> result;
-  for (const auto& value : v) {
+  for (const T& value : v) {
     result.push_back(Sqr(value));
   }
   return result;

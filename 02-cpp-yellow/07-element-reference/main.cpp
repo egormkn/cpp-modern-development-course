@@ -1,18 +1,15 @@
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <stdexcept>
-#include <tuple>
-#include <vector>
 
 using namespace std;
 
 template<typename K, typename V>
 V& GetRefStrict(map<K, V>& m, const K& key) {
-  if (m.count(key) == 0) {
-    throw runtime_error("Map doesn't contain element with this key");
+  if (m.count(key)) {
+    return m.at(key);
   }
-  return m[key];
+  throw runtime_error("Map doesn't contain element with this key");
 }
 
 int main() {

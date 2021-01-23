@@ -1,6 +1,5 @@
-#include <fstream>
+#include <cstdint>
 #include <iostream>
-#include <stdexcept>
 #include <vector>
 
 using namespace std;
@@ -16,7 +15,7 @@ int main() {
     sum += value;
   }
 
-  double average = static_cast<double>(sum) / n;
+  int average = sum / n;
   vector<int> days_above_average;
   for (int i = 0; i < n; ++i) {
     if (temperature[i] > average) {
@@ -25,7 +24,7 @@ int main() {
   }
   
   cout << days_above_average.size() << endl;
-  for (int& number : days_above_average) {
+  for (int number : days_above_average) {
     cout << number << ' ';
   }
   cout << endl;

@@ -38,6 +38,7 @@ class TeamTasks {
                                                  int task_count) {
     TasksInfo& person_tasks = tasks[person];
     TasksInfo updated, not_updated;
+    // Fill updated & not_updated maps
     for (const auto& [status, count] : person_tasks) {
       if (status == TaskStatus::DONE) break;
       int updated_in_status = min(count, task_count);
@@ -52,6 +53,7 @@ class TeamTasks {
         not_updated[status] = not_updated_in_status;
       }
     }
+    // Apply updates
     for (const auto& [status, count] : updated) {
       TaskStatus prev_status =
           static_cast<TaskStatus>(static_cast<int>(status) - 1);
@@ -61,7 +63,7 @@ class TeamTasks {
         person_tasks.erase(prev_status);
       }
     }
-    return make_tuple(updated, not_updated);
+    return {updated, not_updated};
   }
 };
 

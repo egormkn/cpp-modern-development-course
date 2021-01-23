@@ -13,10 +13,6 @@ using namespace std;
 // * оператор сложения двух объектов класса Matrix
 
 class Matrix {
- private:
-  int rows, columns;
-  vector<vector<int>> elements;
-
  public:
   Matrix() : rows(0), columns(0) {}
 
@@ -44,33 +40,37 @@ class Matrix {
   int GetNumRows() const { return rows; }
 
   int GetNumColumns() const { return columns; }
+
+ private:
+  int rows, columns;
+  vector<vector<int>> elements;
 };
 
-istream &operator>>(istream &input, Matrix &matrix) {
+istream &operator>>(istream &stream, Matrix &matrix) {
   int rows, columns;
-  input >> rows >> columns;
+  stream >> rows >> columns;
   matrix.Reset(rows, columns);
   for (int i = 0; i < rows; ++i) {
     for (int j = 0; j < columns; ++j) {
-      input >> matrix.At(i, j);
+      stream >> matrix.At(i, j);
     }
   }
-  return input;
+  return stream;
 }
 
-ostream &operator<<(ostream &output, const Matrix &matrix) {
+ostream &operator<<(ostream &stream, const Matrix &matrix) {
   int rows = matrix.GetNumRows(), columns = matrix.GetNumColumns();
-  output << rows << ' ' << columns << endl;
+  stream << rows << ' ' << columns << endl;
   for (int i = 0; i < rows; ++i) {
     for (int j = 0; j < columns; ++j) {
       if (j > 0) {
-        output << ' ';
+        stream << ' ';
       }
-      output << matrix.At(i, j);
+      stream << matrix.At(i, j);
     }
-    output << endl;
+    stream << endl;
   }
-  return output;
+  return stream;
 }
 
 bool operator==(const Matrix &lhs, const Matrix &rhs) {
@@ -89,7 +89,7 @@ bool operator==(const Matrix &lhs, const Matrix &rhs) {
 Matrix operator+(const Matrix &lhs, const Matrix &rhs) {
   if (lhs.GetNumRows() != rhs.GetNumRows() ||
       lhs.GetNumColumns() != rhs.GetNumColumns()) {
-    throw invalid_argument("Matrices should be the same size");
+    throw invalid_argument("Matrices must be the same size");
   }
   int rows = lhs.GetNumRows(), columns = lhs.GetNumColumns();
   Matrix result(rows, columns);

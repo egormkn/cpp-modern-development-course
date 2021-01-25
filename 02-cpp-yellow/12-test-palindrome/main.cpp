@@ -5,12 +5,11 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <cmath>
 
 using namespace std;
 
-template <typename T>
-ostream& operator<<(ostream& os, const vector<T>& s) {
+template <class T>
+ostream& operator << (ostream& os, const vector<T>& s) {
   os << "{";
   bool first = true;
   for (const auto& x : s) {
@@ -23,8 +22,8 @@ ostream& operator<<(ostream& os, const vector<T>& s) {
   return os << "}";
 }
 
-template <typename T>
-ostream& operator<<(ostream& os, const set<T>& s) {
+template <class T>
+ostream& operator << (ostream& os, const set<T>& s) {
   os << "{";
   bool first = true;
   for (const auto& x : s) {
@@ -37,8 +36,8 @@ ostream& operator<<(ostream& os, const set<T>& s) {
   return os << "}";
 }
 
-template <typename K, typename V>
-ostream& operator<<(ostream& os, const map<K, V>& m) {
+template <class K, class V>
+ostream& operator << (ostream& os, const map<K, V>& m) {
   os << "{";
   bool first = true;
   for (const auto& kv : m) {
@@ -51,22 +50,24 @@ ostream& operator<<(ostream& os, const map<K, V>& m) {
   return os << "}";
 }
 
-template <typename T, typename U>
+template<class T, class U>
 void AssertEqual(const T& t, const U& u, const string& hint = {}) {
   if (t != u) {
     ostringstream os;
     os << "Assertion failed: " << t << " != " << u;
     if (!hint.empty()) {
-      os << " hint: " << hint;
+       os << " hint: " << hint;
     }
     throw runtime_error(os.str());
   }
 }
 
-void Assert(bool b, const string& hint) { AssertEqual(b, true, hint); }
+void Assert(bool b, const string& hint) {
+  AssertEqual(b, true, hint);
+}
 
 class TestRunner {
- public:
+public:
   template <class TestFunc>
   void RunTest(TestFunc func, const string& test_name) {
     try {
@@ -88,12 +89,42 @@ class TestRunner {
     }
   }
 
- private:
+private:
   int fail_count = 0;
 };
 
+bool IsPalindrom(string s) {
+  for (size_t i = 0; i < s.size() / 2; ++i) {
+    if (s[i] != s[s.size() - i - 1]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void TestPalindromes() { 
+  Assert(IsPalindrom(""), "Empty string"); 
+  Assert(IsPalindrom(" "), "One character (space)"); 
+  Assert(IsPalindrom("a"), "One character (letter)"); 
+  Assert(IsPalindrom("abba"), "abba"); 
+  Assert(IsPalindrom("madam"), "madam"); 
+  Assert(IsPalindrom("level"), "level"); 
+  Assert(IsPalindrom("wasitacaroracatisaw"), "wasitacaroracatisaw");
+}
+
+void TestNotPalindromes() {
+  Assert(!IsPalindrom(" a"), "(space) a"); 
+  Assert(!IsPalindrom("a "), "a (space)"); 
+  Assert(!IsPalindrom("abc"), "abc"); 
+  Assert(!IsPalindrom("a bba"), "a bba"); 
+  Assert(!IsPalindrom("dadam"), "dadam"); 
+  Assert(!IsPalindrom("levee"), "levee"); 
+  Assert(!IsPalindrom("wasitacartoracatisaw"), "wasitacartoracatisaw"); 
+}
+
 int main() {
   TestRunner runner;
-  // TODO: Add tests
+  runner.RunTest(TestPalindromes, "TestPalindromes");
+  runner.RunTest(TestNotPalindromes, "TestNotPalindromes");
   return 0;
 }

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <set>
@@ -5,7 +6,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <cmath>
 
 using namespace std;
 
@@ -110,27 +110,31 @@ int GetDistinctRealRootCount(double a, double b, double c) {
   }
 }
 
-void TestAEqualsZero() {
-    AssertEqual(GetDistinctRealRootCount(0, 0, 1), 0, "1 = 0");
-    AssertEqual(GetDistinctRealRootCount(0, 0, -1), 0, "-1 = 0");
-    AssertEqual(GetDistinctRealRootCount(0, 1, 0), 1, "x = 0");
-    AssertEqual(GetDistinctRealRootCount(0, -1, 0), 1, "-x = 0");
-    AssertEqual(GetDistinctRealRootCount(0, 1, 1), 1, "x + 1 = 0");
-    AssertEqual(GetDistinctRealRootCount(0, -1, -1), 1, "-x - 1 = 0");
+void TestLinear() {
+  AssertEqual(GetDistinctRealRootCount(0, 0, 1), 0, "1 = 0");
+  AssertEqual(GetDistinctRealRootCount(0, 0, -1), 0, "-1 = 0");
+  AssertEqual(GetDistinctRealRootCount(0, 1, 0), 1, "x = 0");
+  AssertEqual(GetDistinctRealRootCount(0, -1, 0), 1, "-x = 0");
+  AssertEqual(GetDistinctRealRootCount(0, 1, 1), 1, "x + 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(0, -1, -1), 1, "-x - 1 = 0");
 }
 
-void TestANotEqualsZero() {
-    AssertEqual(GetDistinctRealRootCount(1, 0, 0), 1);
-    AssertEqual(GetDistinctRealRootCount(-1, 0, 0), 1);
-    AssertEqual(GetDistinctRealRootCount(1, 0, 1), 0);
-    AssertEqual(GetDistinctRealRootCount(1, 0, -1), 2);
-    AssertEqual(GetDistinctRealRootCount(-1, 0, -1), 0);
-    AssertEqual(GetDistinctRealRootCount(-1, 0, 1), 2);
+void TestQuadratic() {
+  AssertEqual(GetDistinctRealRootCount(1, 0, 0), 1, "x^2 = 0");
+  AssertEqual(GetDistinctRealRootCount(-1, 0, 0), 1, "-x^2 = 0");
+  AssertEqual(GetDistinctRealRootCount(1, 0, 1), 0, "x^2 + 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(1, 0, -1), 2, "x^2 - 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(-1, 0, -1), 0, "-x^2 - 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(-1, 0, 1), 2, "-x^2 + 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(1, -2, 1), 1, "x^2 - 2x + 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(1, 2, 1), 1, "x^2 + 2x + 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(1, -4, 1), 2, "x^2 - 4x + 1 = 0");
+  AssertEqual(GetDistinctRealRootCount(1, 4, 1), 2, "x^2 + 4x + 1 = 0");
 }
 
 int main() {
   TestRunner runner;
-  runner.RunTest(TestAEqualsZero, "TestAEqualsZero");
-  runner.RunTest(TestANotEqualsZero, "TestANotEqualsZero");
+  runner.RunTest(TestLinear, "TestLinear");
+  runner.RunTest(TestQuadratic, "TestQuadratic");
   return 0;
 }

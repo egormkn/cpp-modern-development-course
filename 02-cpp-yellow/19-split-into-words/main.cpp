@@ -10,11 +10,11 @@ using namespace std;
 
 vector<string> SplitIntoWords(const string& s) {
   vector<string> words;
-  for (auto it = s.begin(); it != s.end();) {
-    it = find_if(it, s.end(), [](char c) { return c != ' '; });
-    auto it2 = find_if(it, s.end(), [](char c) { return c == ' '; });
-    words.emplace_back(it, it2);
-    it = it2;
+  for (auto it = s.begin(); it != s.end(); ) {
+    auto space = find(it, s.end(), ' ');
+    words.push_back({it, space});
+    if (space != s.end()) ++space;
+    it = space;
   }
   return words;
 }

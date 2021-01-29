@@ -12,7 +12,8 @@ void PrintVectorPart(const vector<int>& numbers) {
   auto first_negative =
       find_if(numbers.begin(), numbers.end(), [](int x) { return x < 0; });
   for (auto it = first_negative; it != numbers.begin(); ) {
-    cout << *(--it) << ' ';
+    --it;
+    cout << *it << ' ';
   }
 }
 

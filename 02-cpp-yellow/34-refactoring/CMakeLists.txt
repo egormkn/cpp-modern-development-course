@@ -1,3 +1,3 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-add_executable(refactoring main_v1.cpp)
+add_executable(refactoring main_v2.cpp)

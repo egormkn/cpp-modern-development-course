@@ -11,8 +11,10 @@ class Person {
   virtual string GetType() const = 0;
 
   virtual void Walk(const string& destination) const {
-    cout << GetType() << ": " << Name << " walks to: " << destination << endl;
+    Log() << " walks to: " << destination << endl;
   }
+
+  ostream& Log() const { return cout << GetType() << ": " << Name; }
 
   const string Name;
 };
@@ -24,17 +26,14 @@ class Student : public Person {
 
   string GetType() const override { return "Student"; }
 
-  void Learn() const { cout << GetType() << ": " << Name << " learns" << endl; }
+  void Learn() const { Log() << " learns" << endl; }
 
   void Walk(const string& destination) const override {
     Person::Walk(destination);
     SingSong();
   }
 
-  void SingSong() const {
-    cout << GetType() << ": " << Name << " sings a song: " << FavouriteSong
-         << endl;
-  }
+  void SingSong() const { Log() << " sings a song: " << FavouriteSong << endl; }
 
  private:
   const string FavouriteSong;
@@ -47,9 +46,7 @@ class Teacher : public Person {
 
   string GetType() const override { return "Teacher"; }
 
-  void Teach() const {
-    cout << GetType() << ": " << Name << " teaches: " << Subject << endl;
-  }
+  void Teach() const { Log() << " teaches: " << Subject << endl; }
 
  private:
   const string Subject;
@@ -62,13 +59,13 @@ class Policeman : public Person {
   string GetType() const override { return "Policeman"; }
 
   void Check(const Person& p) const {
-    cout << GetType() << ": " << Name << " checks " << p.GetType() << ". "
-         << p.GetType() << "'s name is: " << p.Name << endl;
+    Log() << " checks " << p.GetType() << ". " << p.GetType()
+          << "'s name is: " << p.Name << endl;
   }
 };
 
-void VisitPlaces(Person& person, vector<string> places) {
-  for (auto p : places) {
+void VisitPlaces(const Person& person, const vector<string>& places) {
+  for (auto& p : places) {
     person.Walk(p);
   }
 }

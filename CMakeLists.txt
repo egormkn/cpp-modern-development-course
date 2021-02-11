@@ -10,6 +10,9 @@ else()
   add_compile_options(-Wall -Wextra -pedantic -Werror -O3)
 endif()
 
+find_package(Threads)
+link_libraries(${CMAKE_THREAD_LIBS_INIT})
+
 file(GLOB cmakelists RELATIVE ${PROJECT_SOURCE_DIR} CONFIGURE_DEPENDS */*/CMakeLists.txt)
 foreach(cmakelist ${cmakelists})
   get_filename_component(dir ${cmakelist} DIRECTORY)

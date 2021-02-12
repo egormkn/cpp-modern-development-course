@@ -66,7 +66,7 @@ Stats ExploreKeyWords(const set<string>& key_words, istream& input) {
   lines.reserve(max_batch_size);
   for (string line; getline(input, line);) {
     lines.push_back(move(line));
-    if (lines.size() >= 5000) {
+    if (lines.size() >= max_batch_size) {
       futures.push_back(async(ExploreLines, ref(key_words), move(lines)));
       lines.reserve(max_batch_size);
     }

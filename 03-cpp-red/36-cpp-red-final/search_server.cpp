@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <future>
 
 #include "iterator_range.h"
 #include "profile.h"
@@ -27,6 +28,14 @@ vector<string_view> SplitIntoWords(string_view str, size_t num_words_hint = 0) {
   return words;
 }
 
+ostream& operator<<(ostream& os, const SearchResult& data) {
+  os << data.query << ':';
+  for (auto& [docid, hitcount] : data.results) {
+    os << " {docid: " << docid << ", hitcount: " << hitcount << "}";
+  }
+  return os;
+}
+
 SearchServer::SearchServer(istream& document_input) {
   UpdateDocumentBase(document_input);
 }
@@ -40,12 +49,14 @@ void SearchServer::UpdateDocumentBase(istream& document_input) {
     new_index.Add(move(document));
   }
 
+  lock_guard<shared_mutex> guard(m);
   index = move(new_index);
 }
 
-void SearchServer::AddQueriesStream(istream& query_input,
-                                    ostream& search_results_output) {
-  // ADD_DURATION(add_queries);
+vector<SearchResult> SearchServer::ProcessQueries(vector<string> queries) {
+  vector<SearchResult> result;
+  result.reserve(queries.size());
+
   vector<shared_ptr<WordDocuments>> word_documents_ptrs;
   word_documents_ptrs.reserve(10);
 
@@ -56,12 +67,13 @@ void SearchServer::AddQueriesStream(istream& query_input,
 
   vector<int> doc_index(num_documents, -1);
 
-  // size_t processed = 0;
-  for (string query; getline(query_input, query);) {
-    // ADD_DURATION(extract_from_index);
-    for (auto word : SplitIntoWords(query, 10)) {
-      shared_ptr<WordDocuments> ptr = index.Lookup(word);
-      if (ptr) word_documents_ptrs.push_back(move(ptr));
+  for (string& query : queries) {
+    {
+      shared_lock<shared_mutex> guard(m);
+      for (auto word : SplitIntoWords(query, 10)) {
+        shared_ptr<WordDocuments> ptr = index.Lookup(word);
+        if (ptr) word_documents_ptrs.push_back(move(ptr));
+      }
     }
 
     for (auto& ptr : word_documents_ptrs) {
@@ -75,7 +87,6 @@ void SearchServer::AddQueriesStream(istream& query_input,
       }
     }
 
-    // ADD_DURATION(sorting);
     partial_sort(query_result.begin(),
                  query_result.begin() + min<size_t>(query_result.size(), 5),
                  query_result.end(),
@@ -85,18 +96,44 @@ void SearchServer::AddQueriesStream(istream& query_input,
                           tie(rhs.second, lhs.first);
                  });
 
-    // ADD_DURATION(printing);
-    search_results_output << query << ':';
-    for (auto& [docid, hitcount] : Head(query_result, 5)) {
-      search_results_output << " {docid: " << docid
-                            << ", hitcount: " << hitcount << "}";
-    }
-    search_results_output << '\n';
+    auto range = Head(query_result, 5);
+    result.push_back({move(query), {range.begin(), range.end()}});
 
-    // ADD_DURATION(clearing);
     query_result.clear();
     word_documents_ptrs.clear();
     fill(doc_index.begin(), doc_index.end(), -1);
+  }
+
+  return result;
+}
+
+void SearchServer::AddQueriesStream(istream& query_input,
+                                    ostream& search_results_output) {
+  const size_t max_num_queries = 500000, batch_size = max_num_queries / 8;
+  vector<string> queries_batch;
+  queries_batch.reserve(batch_size);
+
+  vector<future<vector<SearchResult>>> futures;
+  futures.reserve(max_num_queries / batch_size);
+
+  for (string query; getline(query_input, query);) {
+    queries_batch.push_back(move(query));
+    if (queries_batch.size() >= batch_size) {
+      futures.push_back(
+          async(&SearchServer::ProcessQueries, this, move(queries_batch)));
+      queries_batch.reserve(batch_size);
+    }
+  }
+
+  if (!queries_batch.empty()) {
+    futures.push_back(
+          async(&SearchServer::ProcessQueries, this, move(queries_batch)));
+  }
+
+  for (auto& f : futures) {
+    for (const auto& result : f.get()) {
+      search_results_output << result << '\n';
+    }
   }
 }
 

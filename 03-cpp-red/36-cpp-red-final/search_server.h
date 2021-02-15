@@ -7,10 +7,16 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+#include <shared_mutex>
 
 using namespace std;
 
 using WordDocuments = vector<pair<uint16_t, uint16_t>>;
+
+struct SearchResult {
+  string query;
+  WordDocuments results;
+};
 
 class InvertedIndex {
  public:
@@ -40,5 +46,8 @@ class SearchServer {
   void AddQueriesStream(istream& query_input, ostream& search_results_output);
 
  private:
+  vector<SearchResult> ProcessQueries(vector<string> queries);
+
   InvertedIndex index;
+  shared_mutex m;
 };

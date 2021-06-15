@@ -2,12 +2,16 @@ cmake_minimum_required(VERSION 3.0.0)
 project(cpp-modern-development)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 if (MSVC)
   # warning level 4 and all warnings as errors
   add_compile_options(/W4 /WX)
 else()
   # lots of warnings and all warnings as errors
-  add_compile_options(-Wall -Wextra -pedantic -Werror -O3)
+  # -pedantic
+  add_compile_options(-Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unknown-pragmas -O3)
 endif()
 
 find_package(Threads)
